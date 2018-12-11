@@ -66,7 +66,10 @@ no_cfi_cast_strict: cfi_cast_strict.cpp
 	@# show the strict version behavior
 	@$(CXX) $(CXXFLAGS) -fsanitize=cfi-derived-cast -o ./build/$(detected_OS)/$@ $<
 
+format:
+	clang-format -i *.cpp *.c
+
 clean:
 	rm -f ./build/$(detected_OS)/*
 
-.PHONY: clean all
+.PHONY: clean all format

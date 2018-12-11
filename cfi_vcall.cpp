@@ -1,48 +1,42 @@
 #include <iostream>
 
 struct Base {
-    Base() {}
-    virtual ~Base() {}
-    virtual void printMe() { 
-        std::cout << "Base::printMe\n";
-    }
+	Base() {}
+	virtual ~Base() {}
+
+	virtual void printMe() { std::cout << "Base::printMe\n"; }
 };
 
 struct Derived : Base {
-    Derived() {}
-    virtual ~Derived() {}
+	Derived() {}
+	virtual ~Derived() {}
 
-    virtual void printMe() {
-        std::cout << "Derived::printMe\n";
-    }
+	virtual void printMe() { std::cout << "Derived::printMe\n"; }
 };
 
-// imagine this is an attacker-created structure 
-// in memory
+// imagine this is an attacker-created structure in memory
 struct Evil {
-    Evil() {}
-    virtual ~Evil() {}
+	Evil() {}
+	virtual ~Evil() {}
 
-    virtual void makeAdmin() {
-        std::cout << "CFI Prevents this control flow\n";
-        std::cout << "Evil::makeAdmin\n";
-    }
+	virtual void makeAdmin() {
+		std::cout << "CFI Prevents this control flow\n";
+		std::cout << "Evil::makeAdmin\n";
+	}
 };
 
 int main(int argc, const char *argv[]) {
+	Evil *eptr = new Evil();
+	Derived *dptr = new Derived();
 
-    Evil *eptr = new Evil();
-    Derived* dptr = new Derived();
+	(void)(argc);
+	(void)(argv);
 
-    (void)(argc);
-    (void)(argv);
+	dptr->printMe();
 
-    dptr->printMe();
-    
-    // imagine a type confusion vulnerability
-    // that does something similar
-    dptr = reinterpret_cast<Derived*>(eptr);
-    dptr->printMe();
+	// imagine a type confusion vulnerability that does something similar
+	dptr = reinterpret_cast<Derived *>(eptr);
+	dptr->printMe();
 
-    return 0;
+	return 0;
 }
