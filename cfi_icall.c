@@ -124,14 +124,14 @@ struct foo {
 
 // the struct aligns the function pointer arrays so indexing past the end will reliably
 // call working function pointers
+// clang-format off
 static struct foo f = {
-	// clang-format off
 	.int_funcs = {int_arg},
 	.bad_int_funcs = {bad_int_arg},
 	.float_funcs = {float_arg},
 	.not_entries = {(int_arg_fn)((uintptr_t)(not_entry_point) + 0x20)}
-	// clang-format on
 };
+// clang-format on
 
 int main(int argc, const char *argv[]) {
 	if (argc != 2) {
