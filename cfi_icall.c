@@ -26,6 +26,7 @@ static int not_entry_point(int arg) {
 	// nop sled for x86 / x86-64
 	// these instructions act as a buffer for an indirect control flow transfer to skip
 	// a valid function entry point, but continue to execute normal code
+	// clang-format off
 	__asm__ volatile(
 		"nop\n"
 		"nop\n"
@@ -107,6 +108,7 @@ static int not_entry_point(int arg) {
 		"nop\n"
 		"nop\n"
 		"nop\n");
+	// clang-format on
 	printf("CFI ensures control flow only transfers to potentially valid destinations\n");
 	printf("In %s: (%d)\n", __FUNCTION__, arg);
 	// need to exit or the program will segfault anyway, since the indirect call skipped the function preamble
@@ -123,10 +125,12 @@ struct foo {
 // the struct aligns the function pointer arrays so indexing past the end will reliably
 // call working function pointers
 static struct foo f = {
+	// clang-format off
 	.int_funcs = {int_arg},
 	.bad_int_funcs = {bad_int_arg},
 	.float_funcs = {float_arg},
 	.not_entries = {(int_arg_fn)((uintptr_t)(not_entry_point) + 0x20)}
+	// clang-format on
 };
 
 int main(int argc, const char *argv[]) {
