@@ -63,6 +63,8 @@
 // THE SOFTWARE.
 
 #include <iostream>
+#include <assert.h>
+#include <string.h>
 
 struct Foo {
 	void b1() { std::cout << "I'm Foo, b1!\n"; }
