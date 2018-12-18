@@ -12,13 +12,13 @@ Special thanks to pcc and the LLVM project for the cfi-mfcall sample.
 
 # CFI Examples
 
-* **cfi_icall** demonstrates control flow integrity of indirect calls. The example binary accepts a single command line argument (valid values are 0-3, but try invalid values with both binaries!). The command line argument shows different aspects of indirect call CFI protection, or lack thereof.
-* **cfi_vcall** shows an example of CFI applied to virtual function calls. This example demonstrates how CFI would protect against a type confusion or similar attack.
-* **cfi_mfcall** shows clang's protections for indirect calls via member function pointers of the wrong dynamic type. The example binary accepts a single command line argument (valid values are 0-6). The command line arguemnt shows different aspects of this specific type of indirect call CFI protection, or lack thereof.
-* **cfi_nvcall** shows clang’s protections for calling non-virtual member functions via something that is not an object that has those functions defined.
-* **cfi_unrelated_cast** shows how clang can prevent casts between objects of unrelated types.
-* **cfi_derived_cast** expands on cfi_unrelated_cast and shows how clang can prevent casts from an object of a base class to an object of a derived class, if the object is not actually of the derived class.
-* **cfi_cast_strict** showcases the very specific instance where the default level of base-to-derived cast protection, like in cfi_derived_cast, would not catch an illegal cast.
+* **[icall](source/icall.c)** demonstrates control flow integrity of indirect calls. The example binary accepts a single command line argument (valid values are 0-3, but try invalid values with both binaries!). The command line argument shows different aspects of indirect call CFI protection, or lack thereof.
+* **[vcall](source/vcall.cpp)** shows an example of CFI applied to virtual function calls. This example demonstrates how CFI would protect against a type confusion or similar attack.
+* **[mfcall](source/mfcall.cpp)** shows clang's protections for indirect calls via member function pointers of the wrong dynamic type. The example binary accepts a single command line argument (valid values are 0-6). The command line arguemnt shows different aspects of this specific type of indirect call CFI protection, or lack thereof.
+* **[nvcall](source/nvcall.cpp)** shows clang’s protections for calling non-virtual member functions via something that is not an object that has those functions defined.
+* **[unrelated_cast](source/unrelated_cast.cpp)** shows how clang can prevent casts between objects of unrelated types.
+* **[derived_cast](source/derived_cast.cpp)** expands on unrelated_cast and shows how clang can prevent casts from an object of a base class to an object of a derived class, if the object is not actually of the derived class.
+* **[cast_strict](source/cast_strict.cpp)** showcases the very specific instance where the default level of base-to-derived cast protection, like in derived_cast, would not catch an illegal cast.
 
 # Requirements
 
