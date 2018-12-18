@@ -1,39 +1,117 @@
-#include <assert.h>
-#include <string.h>
+// University of Illinois/NCSA
+// Open Source License
 
-struct SBase1 {
-	void b1() {}
+// Copyright (c) 2009-2018 by the LLVM project
+
+// All rights reserved.
+
+// Developed by:
+
+//	LLVM Team
+
+//	University of Illinois at Urbana-Champaign
+
+//	http://llvm.org
+
+// Permission is hereby granted, free of charge, to any person obtaining a copy of
+// this software and associated documentation files (the "Software"), to deal with
+// the Software without restriction, including without limitation the rights to
+// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+// of the Software, and to permit persons to whom the Software is furnished to do
+// so, subject to the following conditions:
+
+//	* Redistributions of source code must retain the above copyright notice,
+//		this list of conditions and the following disclaimers.
+
+//	* Redistributions in binary form must reproduce the above copyright notice,
+//		this list of conditions and the following disclaimers in the
+//		documentation and/or other materials provided with the distribution.
+
+//	* Neither the names of the LLVM Team, University of Illinois at
+//		Urbana-Champaign, nor the names of its contributors may be used to
+//		endorse or promote products derived from this Software without specific
+//		prior written permission.
+
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
+// CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE
+// SOFTWARE.
+
+// ==============================================================================
+
+// Copyright (c) 2009-2015 by the LLVM project
+
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
+#include <iostream>
+
+struct Foo {
+	void b1() { std::cout << "I'm Foo, b1!\n"; }
 };
 
-struct SBase2 {
-	void b2() {}
+struct Bar {
+	void b2() { std::cout << "I'm Bar, b2!\n"; }
 };
 
-struct S : SBase1, SBase2 {
-	virtual ~S() {}
-	void f1() {}
-	int f2() { return 1; }
-	virtual void g1() {}
-	virtual int g2() { return 1; }
-	virtual int g3() { return 1; }
+struct Baz : Foo, Bar {
+	virtual ~Baz() {}
+
+	void f1() { std::cout << "I'm Baz, f1!\n"; }
+	int f2() {
+		std::cout << "I'm Baz, f2!\n";
+		return 1;
+	}
+	virtual void g1() { std::cout << "I'm Baz, g1!\n"; }
+	virtual int g2() {
+		std::cout << "I'm Baz, g2!\n";
+		return 1;
+	}
+	virtual int g3() {
+		std::cout << "I'm Baz, g3!\n";
+		return 1;
+	}
 };
 
-struct T {
-	virtual ~T() {}
-	void f1() {}
-	int f2() { return 2; }
-	virtual void g1() {}
-	virtual int g2() { return 2; }
-	virtual void g3() {}
+struct Mos {
+	virtual ~Mos() {}
+
+	void f1() { std::cout << "I'm Mos, f1!\n"; }
+	int f2() {
+		std::cout << "I'm Mos, f2!\n";
+		return 2;
+	}
+	virtual void g1() { std::cout << "I'm Mos, g1!\n"; }
+	virtual int g2() {
+		std::cout << "I'm Mos, g2!\n";
+		return 2;
+	}
+	virtual void g3() { std::cout << "I'm Mos, g3!\n"; }
 };
 
-typedef void (S::*S_void)();
+typedef void (Baz::*Baz_void)();
+typedef int (Baz::*Baz_int)();
+typedef int (Mos::*Mos_int)();
 
-typedef int (S::*S_int)();
-typedef int (T::*T_int)();
-
-template <typename To, typename From>
-To bitcast(From f) {
+template <typename To, typename From> To bitcast(From f) {
 	assert(sizeof(To) == sizeof(From));
 	To t;
 	memcpy(&t, &f, sizeof(f));
@@ -41,43 +119,48 @@ To bitcast(From f) {
 }
 
 int main(int argc, char **argv) {
-	S s;
-	T t;
+	printf("Calling a function:\n");
 
-	(void)(argc);
-	(void)(argv);
+	Baz baz;
+	Mos mos;
 
 	switch (argv[1][0]) {
-	case 'a':
-		// A: runtime error: control flow integrity check for type 'int (S::*)()' failed during non-virtual pointer to member function call
-		// A: note: S::f1() defined here
-		(s.*bitcast<S_int>(&S::f1))();
+	case '0':
+		(baz.*bitcast<Baz_int>(&Baz::f1))();
 		break;
-	case 'b':
-		// B: runtime error: control flow integrity check for type 'int (T::*)()' failed during non-virtual pointer to member function call
-		// B: note: S::f2() defined here
-		(t.*bitcast<T_int>(&S::f2))();
+	case '1':
+		(mos.*bitcast<Mos_int>(&Baz::f2))();
 		break;
-	case 'c':
-		// C: runtime error: control flow integrity check for type 'int (S::*)()' failed during virtual pointer to member function call
-		// C: note: vtable is of type 'S'
-		(s.*bitcast<S_int>(&S::g1))();
+	case '2':
+		(baz.*bitcast<Baz_int>(&Baz::g1))();
 		break;
-	case 'd':
-		// D: runtime error: control flow integrity check for type 'int (S::*)()' failed during virtual pointer to member function call
-		// D: note: vtable is of type 'T'
-		(reinterpret_cast<S &>(t).*&S::g2)();
+	case '3':
+		(reinterpret_cast<Baz &>(mos).*&Baz::g2)();
 		break;
-	case 'e':
-		// E: runtime error: control flow integrity check for type 'void (S::*)()' failed during virtual pointer to member function call
-		// E: note: vtable is of type 'S'
-		(s.*bitcast<S_void>(&T::g3))();
+	case '4':
+		(baz.*bitcast<Baz_void>(&Mos::g3))();
 		break;
-	case 'f':
-		(s.*&SBase1::b1)();
+	case '5':
+		(baz.*&Foo::b1)();
 		break;
-	case 'g':
-		(s.*&SBase2::b2)();
+	case '6':
+		(baz.*&Bar::b2)();
+		break;
+	default:
+		if (argc != 2) {
+			printf("Usage: %s <option>\n", argv[0]);
+			printf("Option values:\n");
+			printf("\t0\tIncorrectly call Baz::f1 from baz object\n");
+			printf("\t1\tIncorrectly call Baz::f2 from mos object\n");
+			printf("\t2\tIncorrectly call Baz::g1 from baz object\n");
+			printf("\t3\tIncorrectly call Baz::g2 from mos object\n");
+			printf("\t4\tIncorrectly call Mos::g3 from baz object\n");
+			printf("\t5\tCorrectly call Foo::b1 from baz object\n");
+			printf("\t6\tCorrectly call Bar::b2 from baz object\n");
+			printf("\n\n");
+		} else {
+			printf("Unknown argument: %s\n", argv[1]);
+		}
 		break;
 	}
 }
