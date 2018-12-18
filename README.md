@@ -1,21 +1,20 @@
-# Clang CFI Showcase
+# Clang Control Flow Integrity Showcase
 
 [Control flow integrity](https://www.microsoft.com/en-us/research/publication/control-flow-integrity/) is an exploit mitigation, like stack cookies, DEP, and ASLR. Like other exploit mitigations, the goal of CFI is to prevent bugs from turning into exploits. CFI works by reducing the ability of an attacker to redirect program execution to an attacker controlled destination.
 
-We have created samples with specially crafted bugs to showcase clang's control flow integrity implementation. These examples are an accompaniment to [our blog post describing CFI in clang](https://blog.trailofbits.com/2016/10/17/lets-talk-about-cfi-clang-edition/).
+This repository contains samples with specially crafted bugs to showcase clang's control flow integrity implementation. These examples are an accompaniment to [Trail of Bits' blog post describing CFI in clang](https://blog.trailofbits.com/2016/10/17/lets-talk-about-cfi-clang-edition/).
 
-All of the samples are designed to compile **cleanly** with the absolute maximum warning level* (`-Weverything`).
-
-The bugs in these examples are not statically identified by the compiler, but are detected at runtime via CFI. Where possible, we simulate potential malicious behavior that occurs without CFI protections.
+The bugs in these examples are not statically identified by the compiler, but are detected at runtime via CFI. Where possible, malicious behavior that occurs without CFI protections is simulated.
 
 Each example builds two binaries, one with CFI protection (e.g. `cfi_icall`) and one without CFI protections (e.g. `no_cfi_icall`).
 
-*Ok, we lied, we had to disable two warnings, one about C++98 compatibility, and one about virtual functions being defined inline. The point is still valid since those warnings do not relate to potential bugs.
+Special thanks to pcc and the LLVM project for the cfi-mfcall sample.
 
 # CFI Examples
 
 * **cfi_icall** demonstrates control flow integrity of indirect calls. The example binary accepts a single command line argument (valid values are 0-3, but try invalid values with both binaries!). The command line argument shows different aspects of indirect call CFI protection, or lack thereof.
 * **cfi_vcall** shows an example of CFI applied to virtual function calls. This example demonstrates how CFI would protect against a type confusion or similar attack.
+* **cfi_mfcall** shows clang's protections for indirect calls via member function pointers of the wrong dynamic type. The example binary accepts a single command line argument (valid values are 0-6). The command line arguemnt shows different aspects of this specific type of indirect call CFI protection, or lack thereof.
 * **cfi_nvcall** shows clang’s protections for calling non-virtual member functions via something that is not an object that has those functions defined.
 * **cfi_unrelated_cast** shows how clang can prevent casts between objects of unrelated types.
 * **cfi_derived_cast** expands on cfi_unrelated_cast and shows how clang can prevent casts from an object of a base class to an object of a derived class, if the object is not actually of the derived class.
@@ -23,45 +22,12 @@ Each example builds two binaries, one with CFI protection (e.g. `cfi_icall`) and
 
 # Requirements
 
-These examples assume a Linux build environment with clang-3.9 and the GNU gold linker.
+Each of these samples have been tested under Ubuntu 18.04 and macOS 10.14 using clang 7 with lld 7, however, any version of clang that supports these CFI schemes and an LTO capable linker should be fine.
 
-They should be portable to other operating systems; the only strict requirements are clang 3.7+ and an LTO capable linker.
+I attempted to build and test the samples on Windows 10 as well, but using cmake to target the MSVC ABI with a copy of clang that supports GNU-like command line arguments is currently unsupported. I'll attempt to do this again sometime in the future.
 
-## Installing clang 3.9 on Linux
+# Building
 
-The following commands should install clang 3.9 on Ubuntu-based Linux distriutions.
+Short bash scripts are provided to help with compiling the example binaries, cleaning the build directory, and formatting the source files.
 
-    UBUNTU_RELEASE=`lsb_release -sc`
-    sudo apt-get install -y software-properties-common build-essential
-    wget -qO - http://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-    sudo add-apt-repository -y "deb http://apt.llvm.org/${UBUNTU_RELEASE}/ llvm-toolchain-${UBUNTU_RELEASE}-3.9 main"
-    sudo apt-get update
-    sudo apt-get install -y clang-3.9
-
-## Installing clang 3.9 on MacOS
-The following instructions work to install clang 3.9 on MacOS 10.11 (El Capitan) and MacOS 10.12 (Sierra). These instructions are adapted from [this Github issues post](https://github.com/explosion/spaCy/issues/267).
-
-    curl -O http://llvm.org/releases/3.9.0/clang+llvm-3.9.0-x86_64-apple-darwin.tar.xz
-    tar xJf clang+llvm-3.9.0-x86_64-apple-darwin.tar.xz
-    sudo mkdir -p /opt
-    sudo mv clang+llvm-3.9.0-x86_64-apple-darwin /opt/llvm39
-
-    export CC=/opt/llvm39/bin/clang
-    export CXX=/opt/llvm39/bin/clang++
-    export PATH=/opt/llvm39/bin:$PATH
-    export C_INCLUDE_PATH=/opt/llvm39/include:$C_INCLUDE_PATH
-    export CPLUS_INCLUDE_PATH=/opt/llvm39/include:$CPLUS_INCLUDE_PATH
-    export LIBRARY_PATH=/opt/llvm39/lib:$LIBRARY_PATH
-    export DYLD_LIBRARY_PATH=/opt/llvm39/lib:$DYLD_LIBRARY_PATH
-
-Makefile changes are needed to build these samples on MacOS:
-
-* The `CC` and `CXX` variables should say `clang`, and not `clang-3.9`
-* The default linker on MacOS supports LTO; the `-B${GOLD}` flag should be removed.
-
-After these changes, the header of the Makefile should look similar to the following:
-
-    CXX = /opt/llvm39/bin/clang++
-    CC = /opt/llvm39/bin/clang
-    CFLAGS = -Weverything -Werror -pedantic -std=c99 -O0 -fvisibility=hidden -flto -fno-sanitize-trap=all
-    CXXFLAGS = -Weverything -Werror -pedantic -Wno-c++98-compat -Wno-weak-vtables -std=c++11 -O0 -fvisibility=hidden -flto -fno-sanitize-trap=all
+Building is just a quick `cmake ../ && make` from the build directory if you'd rather not use the scripts, though that relies on some assumptions about your build environment to work properly
