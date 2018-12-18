@@ -161,7 +161,7 @@ int main(int argc, char **argv) {
 			printf("\t6\tCorrectly call Bar::b2 from baz object\n");
 			printf("\n\n");
 		} else {
-			printf("Unknown argument: %s\n", argv[1]);
+			printf("Unknown argument or no arguments given\n");
 		}
 		break;
 	}
