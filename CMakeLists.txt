@@ -21,6 +21,11 @@ add_executable(cfi_icall cfi_icall.c)
 target_compile_options(cfi_icall PRIVATE "-fsanitize=cfi-icall")
 target_link_options(cfi_icall PRIVATE "-fsanitize=cfi-icall")
 
+project(cfi_mfcall)
+add_executable(cfi_mfcall cfi_mfcall.cpp)
+target_compile_options(cfi_mfcall PRIVATE "-fsanitize=cfi-mfcall")
+target_link_options(cfi_mfcall PRIVATE "-fsanitize=cfi-mfcall")
+
 project(cfi_nvcall)
 add_executable(cfi_nvcall cfi_nvcall.cpp)
 target_compile_options(cfi_nvcall PRIVATE "-fsanitize=cfi-nvcall")
@@ -48,6 +53,9 @@ add_executable(no_cfi_derived_cast cfi_derived_cast.cpp)
 
 project(no_cfi_icall)
 add_executable(no_cfi_icall cfi_icall.c)
+
+project(no_cfi_mfcall)
+add_executable(no_cfi_mfcall cfi_mfcall.cpp)
 
 project(no_cfi_nvcall)
 add_executable(no_cfi_nvcall cfi_nvcall.cpp)
