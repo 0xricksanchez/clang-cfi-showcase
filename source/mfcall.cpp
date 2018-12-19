@@ -62,8 +62,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#include <iostream>
 #include <assert.h>
+#include <iostream>
 #include <string.h>
 
 struct Foo {
