@@ -22,7 +22,7 @@ Special thanks to pcc and the LLVM project for the cfi-mfcall sample.
 
 # Requirements
 
-Each of these samples have been tested under Ubuntu 18.04 and macOS 10.14 using clang 7 with lld 7, however, any version of clang that supports these CFI schemes and an LTO capable linker should be fine.
+Each of these samples have been tested under Ubuntu 18.04 and macOS 10.14 using cmake 3.13 and the llvm 7 toolchain, however, any version of clang that supports these CFI schemes and an LTO capable linker should be fine.
 
 I attempted to build and test the samples on Windows 10 as well, but using cmake to target the MSVC ABI with a copy of clang that supports GNU-like command line arguments is currently unsupported. I'll attempt to do this again sometime in the future.
 
