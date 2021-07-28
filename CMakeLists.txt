@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.13)
 
-set(CMAKE_CXX_FLAGS "-Weverything -Werror -pedantic -Wno-c++98-compat -Wno-weak-vtables -std=c++14 -O0 -fvisibility=hidden -flto -fno-sanitize-trap=all")
-set(CMAKE_C_FLAGS "-Weverything -Werror -pedantic -std=c99 -O0 -fvisibility=hidden -flto -fno-sanitize-trap=all")
+set(CMAKE_CXX_FLAGS "-Werror -pedantic -Wno-c++98-compat -Wno-weak-vtables -std=c++14 -O0 -fvisibility=default -flto")
+set(CMAKE_C_FLAGS "-Werror -pedantic -std=c99 -O0 -fvisibility=default -flto -fno-sanitize-trap=all")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/build/bin")
 
