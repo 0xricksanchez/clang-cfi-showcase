@@ -27,87 +27,16 @@ static int not_entry_point(int arg) {
 	// these instructions act as a buffer for an indirect control flow transfer to skip
 	// a valid function entry point, but continue to execute normal code
 	// clang-format off
-	__asm__ volatile(
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n"
-		"nop\n");
+	 __asm__ volatile (
+            "nop\n" "nop\n" "nop\n" "nop\n" "nop\n" "nop\n" "nop\n" "nop\n" "nop\n" "nop\n"
+            "nop\n" "nop\n" "nop\n" "nop\n" "nop\n" "nop\n" "nop\n" "nop\n" "nop\n" "nop\n"
+            "nop\n" "nop\n" "nop\n" "nop\n" "nop\n" "nop\n" "nop\n" "nop\n" "nop\n" "nop\n"
+            "nop\n" "nop\n" "nop\n" "nop\n" "nop\n" "nop\n" "nop\n" "nop\n" "nop\n" "nop\n"
+            "nop\n" "nop\n" "nop\n" "nop\n" "nop\n" "nop\n" "nop\n" "nop\n" "nop\n" "nop\n"
+            "nop\n" "nop\n" "nop\n" "nop\n" "nop\n" "nop\n" "nop\n" "nop\n" "nop\n" "nop\n"
+            "nop\n" "nop\n" "nop\n" "nop\n" "nop\n" "nop\n" "nop\n" "nop\n" "nop\n" "nop\n"
+            "nop\n" "nop\n" "nop\n" "nop\n" "nop\n" "nop\n" "nop\n" "nop\n" "nop\n" "nop\n"
+            );
 	// clang-format on
 	printf("CFI ensures control flow only transfers to potentially valid destinations\n");
 	printf("In %s: (%d)\n", __FUNCTION__, arg);
@@ -115,6 +44,7 @@ static int not_entry_point(int arg) {
 	exit(arg);
 }
 
+// This defines the struct fields <ret_val> <arr>[size]
 struct foo {
 	int_arg_fn int_funcs[1];
 	int_arg_fn bad_int_funcs[1];
@@ -124,6 +54,13 @@ struct foo {
 
 // the struct aligns the function pointer arrays so indexing past the end will reliably
 // call working function pointers
+// Does some "scalar initialization" for struct f 
+// https://en.cppreference.com/w/c/language/scalar_initialization
+// The expression is evaluated, and its value, after conversion as if by assignment to the type of the object, becomes the initial value of the object being initialized. 
+// Scalar variables are used to represent individual fixed-size data objects, such as integers and pointers...
+// And we need the scalar init routine to properly fill the array field with the function pointer
+// the .fun notation is a C99 feature that allows initialization of struct members by name
+// https://en.cppreference.com/w/c/language/struct_initialization
 // clang-format off
 static struct foo f = {
 	.int_funcs = {int_arg},
@@ -158,3 +95,28 @@ int main(int argc, const char *argv[]) {
 
 	return f.int_funcs[idx](idx);
 }
+
+/* no CFI compiled test binary right in main() 
+// This shows aus the initialized struct
+// The addresses refer to the actual functions so @ 0x5555555552b0 theres int_arg()
+pwndbg> p f
+$1 = {
+  int_funcs = {0x5555555552b0 <int_arg>},
+  bad_int_funcs = {0x5555555552e0 <bad_int_arg>},
+  float_funcs = {0x555555555320 <float_arg>},
+  not_entries = {0x555555555390 <not_entry_point+32>}
+}
+// Accessing a single field 
+pwndbg> p f.int_funcs
+$2 = {0x5555555552b0 <int_arg>}
+// We can actually acess struct members normally and add an index to it to access other struct member fields..
+// index 0 is always the indexed struct field we accessed by its name
+// f.int_funcs[0] == f.int_funcs
+pwndbg> p f.int_funcs[0]
+$7 = (int_arg_fn) 0x5555555552b0 <int_arg>
+pwndbg> p f.int_funcs[1]
+$8 = (int_arg_fn) 0x5555555552e0 <bad_int_arg>
+pwndbg> p f.int_funcs[2]
+$9 = (int_arg_fn) 0x555555555320 <float_arg>
+pwndbg> p f.int_funcs[3]
+$10 = (int_arg_fn) 0x555555555390 <not_entry_point+32>
