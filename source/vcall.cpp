@@ -1,7 +1,12 @@
 #include <iostream>
 
+// Only difference between structs and classes in cpp is that in
+// structs members are public while in classes they are private
+
 struct Base {
-	Base() {}
+    // class constructor
+    Base() {}
+    // ~ indicates the destructor of a class
 	virtual ~Base() {}
 
 	virtual void printMe() { std::cout << "Base::printMe\n"; }
@@ -28,7 +33,8 @@ struct Evil {
 int main(int argc, const char *argv[]) {
 	Evil *eptr = new Evil();
 	Derived *dptr = new Derived();
-
+    
+    // supress warnings of unused arguments
 	(void)(argc);
 	(void)(argv);
 

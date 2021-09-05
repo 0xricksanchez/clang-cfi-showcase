@@ -120,3 +120,4 @@ pwndbg> p f.int_funcs[2]
 $9 = (int_arg_fn) 0x555555555320 <float_arg>
 pwndbg> p f.int_funcs[3]
 $10 = (int_arg_fn) 0x555555555390 <not_entry_point+32>
+*/

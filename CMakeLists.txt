@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.13)
 
-set(CMAKE_CXX_FLAGS "-Wno-weak-vtables -std=c++14 -O0 -fvisibility=default -flto")
-set(CMAKE_C_FLAGS "-std=c99 -O0 -fvisibility=default -flto -fno-sanitize-trap=all")
+# set(CMAKE_CXX_FLAGS "-Wno-weak-vtables -std=c++14 -O0 -fvisibility=default -flto")
+set(CMAKE_CXX_FLAGS "-Wno-c++98-compat -Wno-weak-vtables -std=c++11 -O0 -fvisibility=hidden -flto -fno-sanitize-trap=all -ggdb")
+set(CMAKE_C_FLAGS "-std=c99 -O0 -fvisibility=default -flto -fno-sanitize-trap=all -ggdb")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/build/bin")
 
