@@ -120,7 +120,7 @@ template <typename To, typename From> To bitcast(From f) {
 	return t;
 }
 
-void print_help(int argc) {
+void print_help(int argc, char **argv) {
     if (argc != 2) {
 		printf("Usage: %s <option>\n", argv[0]);
 		printf("Option values:\n");
@@ -139,7 +139,7 @@ void print_help(int argc) {
 
 int main(int argc, char **argv) {
 	if (argc != 2) {
-		print_help(argc);
+		print_help(argc, argv);
       	return -1;
     };
 	
@@ -171,7 +171,7 @@ int main(int argc, char **argv) {
 		(baz.*&Bar::b2)();
 		break;
 	default:
-		print_help(argc);
+		print_help(argc, argv);
         return -1;
 	}
 }
