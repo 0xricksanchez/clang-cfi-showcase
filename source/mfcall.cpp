@@ -120,7 +120,29 @@ template <typename To, typename From> To bitcast(From f) {
 	return t;
 }
 
+void print_help(int argc) {
+    if (argc != 2) {
+		printf("Usage: %s <option>\n", argv[0]);
+		printf("Option values:\n");
+		printf("\t0\tIncorrectly call Baz::f1 from baz object\n");
+		printf("\t1\tIncorrectly call Baz::f2 from mos object\n");
+		printf("\t2\tIncorrectly call Baz::g1 from baz object\n");
+		printf("\t3\tIncorrectly call Baz::g2 from mos object\n");
+		printf("\t4\tIncorrectly call Mos::g3 from baz object\n");
+		printf("\t5\tCorrectly call Foo::b1 from baz object\n");
+		printf("\t6\tCorrectly call Bar::b2 from baz object\n");
+		printf("\n\n");
+	} else {
+		printf("Unknown argument or no arguments given\n");
+	}
+}
+
 int main(int argc, char **argv) {
+	if (argc != 2) {
+		print_help(argc);
+      	return -1;
+    };
+	
 	printf("Calling a function:\n");
 
 	Baz baz;
@@ -149,20 +171,7 @@ int main(int argc, char **argv) {
 		(baz.*&Bar::b2)();
 		break;
 	default:
-		if (argc != 2) {
-			printf("Usage: %s <option>\n", argv[0]);
-			printf("Option values:\n");
-			printf("\t0\tIncorrectly call Baz::f1 from baz object\n");
-			printf("\t1\tIncorrectly call Baz::f2 from mos object\n");
-			printf("\t2\tIncorrectly call Baz::g1 from baz object\n");
-			printf("\t3\tIncorrectly call Baz::g2 from mos object\n");
-			printf("\t4\tIncorrectly call Mos::g3 from baz object\n");
-			printf("\t5\tCorrectly call Foo::b1 from baz object\n");
-			printf("\t6\tCorrectly call Bar::b2 from baz object\n");
-			printf("\n\n");
-		} else {
-			printf("Unknown argument or no arguments given\n");
-		}
-		break;
+		print_help(argc);
+        return -1;
 	}
 }
